@@ -1,4 +1,5 @@
 using InventoryWeb;
+using InventoryWeb.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -10,5 +11,7 @@ builder.Services.AddScoped(sp => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7242")
 });
+
+builder.Services.AddScoped<ProductApiService>();
 
 await builder.Build().RunAsync();
