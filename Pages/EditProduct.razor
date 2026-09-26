@@ -1,0 +1,39 @@
+﻿@page "/products/edit/{id:int}"
+@using InventoryWeb.Models
+@using InventoryWeb.Services
+@inject ProductApiService ProductApiService
+
+<h3>Editar producto</h3>
+
+@if (loading)
+{
+    <p>Cargando producto...</p>
+}
+else if (product == null)
+{
+    <p>No se encontró el producto.</p>
+}
+else
+{
+    <p>Producto: @product.Name</p>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private ProductDto? product;
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            product = await ProductApiService.GetProductByIdAsync(id);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+}
