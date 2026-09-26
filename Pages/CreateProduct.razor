@@ -36,8 +36,8 @@
         <ValidationMessage For="@(() => product.Stock)" />
     </div>
 
-    <button type="submit" class="btn btn-primary">
-        Guardar
+    <button type="submit" class="btn btn-primary" disabled="@saving">
+        @(saving ? "Guardando..." : "Guardar")
     </button>
 </EditForm>
 
@@ -49,9 +49,12 @@
 @code {
     private CreateProductDto product = new();
     private string message = "";
+    private bool saving = false;
 
     private async Task SaveProduct()
     {
+        saving = true;
+
         var response = await ProductApiService.CreateProductAsync(product);
 
         if (response.IsSuccessStatusCode)
@@ -61,6 +64,7 @@
         else
         {
             message = "No se pudo crear el producto.";
+            saving = false;
         }
     }
 }

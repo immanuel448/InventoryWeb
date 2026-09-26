@@ -44,8 +44,8 @@ else
             <ValidationMessage For="@(() => editProduct.Stock)" />
         </div>
 
-        <button type="submit" class="btn btn-primary">
-            Guardar cambios
+        <button type="submit" class="btn btn-primary" disabled="@saving">
+            @(saving ? "Guardando..." : "Guardar cambios")
         </button>
     </EditForm>
 }
@@ -63,6 +63,7 @@ else
     private UpdateProductDto editProduct = new();
     private bool loading = true;
     private string message = "";
+    private bool saving = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,6 +90,8 @@ else
     //para guardar el formulario
     private async Task UpdateProduct()
     {
+        saving = true;
+
         var response = await ProductApiService.UpdateProductAsync(id, editProduct);
 
         if (response.IsSuccessStatusCode)
@@ -98,6 +101,7 @@ else
         else
         {
             message = "No se pudo actualizar el producto.";
+            saving = false;
         }
     }
 }
