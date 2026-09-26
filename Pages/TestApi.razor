@@ -1,0 +1,26 @@
+﻿@page "/test-api"
+@inject HttpClient Http
+
+<h3>Test API</h3>
+
+<button @onclick="TestConnection">Probar API</button>
+
+<p>@message</p>
+
+@code {
+    private string message = "";
+
+    private async Task TestConnection()
+    {
+        try
+        {
+            var response = await Http.GetAsync("/api/products");
+
+            message = $"Status: {(int)response.StatusCode} {response.StatusCode}";
+        }
+        catch (Exception ex)
+        {
+            message = $"Error: {ex.Message}";
+        }
+    }
+}
