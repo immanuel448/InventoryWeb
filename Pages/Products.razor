@@ -1,7 +1,9 @@
 ﻿@page "/products"
 @using InventoryWeb.Services
 @using InventoryWeb.Models
+@using Microsoft.JSInterop
 @inject ProductApiService ProductApiService
+@inject IJSRuntime JSRuntime
 
 <h3>Productos</h3>
 
@@ -27,6 +29,7 @@ else
                 <th>Precio</th>
                 <th>Stock</th>
                 <th>Activo</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -38,6 +41,11 @@ else
                     <td>@product.Price</td>
                     <td>@product.Stock</td>
                     <td>@(product.IsActive ? "Sí" : "No")</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => DeleteProduct(product.Id)">
+                            Eliminar
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -62,6 +70,25 @@ else
         finally
         {
             loading = false;
+        }
+    }
+
+    private async Task DeleteProduct(int id)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>(
+            "confirm",
+            "¿Estás seguro de eliminar este producto?");
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        var response = await ProductApiService.DeleteProductAsync(id);
+
+        if (response.IsSuccessStatusCode)
+        {
+            products = await ProductApiService.GetProductsAsync();
         }
     }
 }
