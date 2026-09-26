@@ -1,0 +1,67 @@
+﻿@page "/products"
+@using InventoryWeb.Services
+@using InventoryWeb.Models
+@inject ProductApiService ProductApiService
+
+<h3>Productos</h3>
+
+@if (loading)
+{
+    <p>Cargando productos...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p>@errorMessage</p>
+}
+else if (products.Count == 0)
+{
+    <p>No hay productos registrados.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Activo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    <td>@product.Price</td>
+                    <td>@product.Stock</td>
+                    <td>@(product.IsActive ? "Sí" : "No")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ProductDto> products = new();
+    private bool loading = true;
+    private string errorMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            products = await ProductApiService.GetProductsAsync();
+        }
+        catch
+        {
+            errorMessage = "No se pudieron cargar los productos.";
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+}
