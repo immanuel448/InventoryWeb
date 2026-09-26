@@ -15,7 +15,43 @@ else if (product == null)
 }
 else
 {
-    <p>Producto: @product.Name</p>
+    <EditForm Model="editProduct" OnValidSubmit="UpdateProduct">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label>Nombre</label>
+            <InputText class="form-control" @bind-Value="editProduct.Name" />
+            <ValidationMessage For="@(() => editProduct.Name)" />
+        </div>
+
+        <div class="mb-3">
+            <label>Descripción</label>
+            <InputText class="form-control" @bind-Value="editProduct.Description" />
+            <ValidationMessage For="@(() => editProduct.Description)" />
+        </div>
+
+        <div class="mb-3">
+            <label>Precio</label>
+            <InputNumber class="form-control" @bind-Value="editProduct.Price" />
+            <ValidationMessage For="@(() => editProduct.Price)" />
+        </div>
+
+        <div class="mb-3">
+            <label>Stock</label>
+            <InputNumber class="form-control" @bind-Value="editProduct.Stock" />
+            <ValidationMessage For="@(() => editProduct.Stock)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Guardar cambios
+        </button>
+    </EditForm>
+}
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p class="mt-3">@message</p>
 }
 
 @code {
@@ -23,17 +59,44 @@ else
     public int id { get; set; }
 
     private ProductDto? product;
+    private UpdateProductDto editProduct = new();
     private bool loading = true;
+    private string message = "";
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            // se obtiene el producto
             product = await ProductApiService.GetProductByIdAsync(id);
+
+            if (product != null)
+            {
+                //se llena el formulario
+                editProduct.Name = product.Name;
+                editProduct.Description = product.Description;
+                editProduct.Price = product.Price;
+                editProduct.Stock = product.Stock;
+            }
         }
         finally
         {
             loading = false;
+        }
+    }
+
+    //para guardar el formulario
+    private async Task UpdateProduct()
+    {
+        var response = await ProductApiService.UpdateProductAsync(id, editProduct);
+
+        if (response.IsSuccessStatusCode)
+        {
+            message = "Producto actualizado correctamente.";
+        }
+        else
+        {
+            message = "No se pudo actualizar el producto.";
         }
     }
 }
